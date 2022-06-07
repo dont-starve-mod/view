@@ -1,0 +1,129 @@
+<!-- 为什么需要二次跳转? -->
+
+<!--【错误追踪】将游戏报错日志写入一个本地网页文件。在旧版本中, 从饥荒直接打开一个本地网页是可行的, 然而,
+某次更新后, 饥荒官方屏蔽了这一方案, 只允许打开在线网页, 不允许打开本地网页。
+因此, 【错误追踪】使用在线网页作为中转站, 实现对本地网页的查看。
+
+如想了解更多细节, 请浏览本网页及模组的源代码。 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<style type="text/css">
+		body {background-color: #eeeeee; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Hiragino Kaku Gothic ProN", Meiryo;}
+		.main {position: relative; }
+		.container {position: fixed; left: 0px; right: 0px; top: 0px; bottom: 0px;}
+		.container {padding-top: 10vh; padding-bottom: 10vh;}
+		.container {background-color: #BBB;}
+
+		#box {width: 400px; height: auto; margin: auto; min-height:300px}
+		#box {background-color: #fff;}
+		#box {border: solid 1px #555; border-radius: 2px; box-shadow: 3px 3px 5px #888;}
+		#box {display: flex; flex-direction: column; text-align: center; box-sizing: border-box; }
+		#box h1 {font-size: 1.5em; color: #222;}
+		#box ul {margin-top: 0px; margin-left: 30px; margin-right: 30px; padding: 0px 0px;}
+		#box ul {border-top: solid 1px #ccc; /*border-bottom: solid 1px #ccc;*/}
+		#box ul li {padding: 0px 0px; list-style-type: none; margin-bottom: 10px; margin-top: 10px}
+		#box ul li a {display: inline-block; padding: 10px 10px; text-decoration: none; font-weight: 400;}
+		#box ul li a:link, #box ul li a:visited {color: #aaa;}
+		#box ul li a:hover, #box ul li a:active {color: #222; text-decoration: underline;}
+		#box ul li:first-child a {font-weight: 700;}
+		#box ul li:first-child a:link, #box ul li:first-child a:visited {color: #666;}
+		#box ul li:first-child a:hover, #box ul li:first-child a:active {color: #222;}
+
+		.about {font-size: .5em; color: #666; margin-top: 0;}
+
+		#info {display: none; padding: 0px 16px; line-height: 2em; text-align: left;}
+		#info a:link, #info a:visited {text-decoration: none}
+		#info a:hover, #info a:active {text-decoration: underline;}
+	</style>
+	<script>
+
+function getQueryString(name){
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null) {
+		return decodeURIComponent(r[2]);
+	};
+	console.log("failed to get param: " + name);
+	return null;
+}
+
+function formatTime(value) {
+	let date = new Date(value * 1000);
+	let year = date.getFullYear();
+	let month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+	let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+	let hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+	let minute = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+	let second = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
+	return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
+function parseHistory(history){
+	var temp = history.split(";");
+	var result = [];
+	for (var i = 0; i < temp.length; ++i){
+		var parts = temp[i].split(",");
+		if (parts.length == 2 
+			&& !isNaN(parseInt(parts[0])) 
+			&& !isNaN(parseInt(parts[1]))
+			&& !(parseInt(parts[1]) == -1)){
+			result.push([parseInt(parts[0]), formatTime(parseInt(parts[1]))]);
+		}
+	}
+	console.log(result);
+	return result;
+}
+
+window.onload = function(){
+	console.log("URL length: ", window.location.href.length);
+
+	var root = getQueryString("r"); 	//  /User/DST/mods/
+	var prefix = getQueryString("pre"); //  bugtracker-log-
+	var history = getQueryString("h");  //  5,99999;6,1145;9,13130;10,-1
+
+	var box = document.getElementById("box");
+	var title = box.getElementsByTagName("h1")[0];
+	var list = box.getElementsByTagName("ul")[0];
+
+	if (root && prefix && history){
+		history = parseHistory(history);
+		if (history.length){
+			for (var i = 0; i < history.length; ++i){
+				var item = document.createElement("li");
+				var link = document.createElement("a");
+				list.appendChild(item);
+				item.appendChild(link);
+
+				link.href = "file://" + root + prefix + history[i][0] + ".html";
+				link.innerHTML = history[i][1];
+				console.log(i, link.href);
+				if (i == 0){
+					link.innerHTML = "(最新) " + link.innerHTML;
+				}
+			}
+			title.innerHTML = "查看报错日志";
+			return true;
+		}
+	}
+
+	title.innerHTML = "错误追踪+";
+	document.getElementById("info").style.display = "block";
+}
+	</script>
+</head>
+<body>
+	<div class="main">
+		<div class="container">
+			<div id="box">
+				<h1></h1>				
+				<ul></ul>
+				<div id="info">
+					<p>“错误追踪+”是饥荒联机版的一个辅助模组。</p>
+					<p>当游戏报错时, 该模组提供详细的错误分析日志, 方便看不懂代码的普通玩家快速排查问题。</p>
+					<p><a href="https://dont-starve-mod.github.io/lw/zh/bugtracker_index/" target="_blank">查看详情</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>

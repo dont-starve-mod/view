@@ -1,42 +1,183 @@
-<!-- 为什么需要二次跳转? -->
-
-<!--【错误追踪】将游戏报错日志写入一个本地网页文件。在旧版本中, 从饥荒直接打开一个本地网页是可行的, 然而,
-某次更新后, 饥荒官方屏蔽了这一方案, 只允许打开在线网页, 不允许打开本地网页。
-因此, 【错误追踪】使用在线网页作为中转站, 实现对本地网页的查看。
-
-如想了解更多细节, 请浏览本网页及模组的源代码。 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
 	<style type="text/css">
-		body {background-color: #eeeeee; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Hiragino Kaku Gothic ProN", Meiryo;}
-		.main {position: relative; }
-		.container {position: fixed; left: 0px; right: 0px; top: 0px; bottom: 0px;}
-		.container {padding-top: 10vh; padding-bottom: 10vh;}
-		.container {background-color: #BBB;}
+body {
+	background-color: #fff; 
+	padding: 0; margin: 0; 
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Hiragino Kaku Gothic ProN", Meiryo;
+}
 
-		#box {width: 400px; height: auto; margin: auto; min-height:300px}
-		#box {background-color: #fff;}
-		#box {border: solid 1px #555; border-radius: 2px; box-shadow: 3px 3px 5px #888;}
-		#box {display: flex; flex-direction: column; text-align: center; box-sizing: border-box; }
-		#box h1 {font-size: 1.5em; color: #222;}
-		#box ul {margin-top: 0px; margin-left: 30px; margin-right: 30px; padding: 0px 0px;}
-		#box ul {border-top: solid 1px #ccc; /*border-bottom: solid 1px #ccc;*/}
-		#box ul li {padding: 0px 0px; list-style-type: none; margin-bottom: 10px; margin-top: 10px}
-		#box ul li a {display: inline-block; padding: 10px 10px; text-decoration: none; font-weight: 400;}
-		#box ul li a:link, #box ul li a:visited {color: #aaa;}
-		#box ul li a:hover, #box ul li a:active {color: #222; text-decoration: underline;}
-		#box ul li:first-child a {font-weight: 700;}
-		#box ul li:first-child a:link, #box ul li:first-child a:visited {color: #666;}
-		#box ul li:first-child a:hover, #box ul li:first-child a:active {color: #222;}
+@media (min-width: 576px){
+.container {
+	max-width: 540px;
+}}
 
-		.about {font-size: .5em; color: #666; margin-top: 0;}
+@media (min-width: 768px){
+.container {
+	max-width: 720px;
+}}
 
-		#info {display: none; padding: 0px 16px; line-height: 2em; text-align: left;}
-		#info a:link, #info a:visited {text-decoration: none}
-		#info a:hover, #info a:active {text-decoration: underline;}
-	</style>
-	<script>
+@media (min-width: 992px){
+.container {
+	max-width: 960px;
+}}
+
+@media (min-width: 1200px){
+.container {
+	max-width: 1140px;
+}}
+
+.container {
+	width: 100%;
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+h2 {
+	font-weight: 400;
+}
+
+h4 {
+	font-size: 1.5rem;
+	margin-bottom: .5rem;
+	margin-top: 1.25rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.card {
+	min-height: 120px;
+	margin-bottom: .75rem;
+	background-color: #fff;
+	border: 1px solid rgba(0,0,0,0.125);
+	border-radius: .25rem;
+	text-align: center;
+}
+
+code {
+	display: block;
+	margin: 0;
+	outline-color: #36464e;
+	background-color: #f5f5f5;
+	overflow: auto;
+	padding: .75em 1em;
+	margin: 1em 1em;
+	user-select: all;
+	-webkit-user-select: all; 
+}
+
+.icon {
+	padding-left: .1em;
+	padding-right: -.1em;
+	width: 1.1em; height: 1.1em;
+	vertical-align: -.2em;
+}
+
+.info {
+	color: #333;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid rgba(0,0,0,0.125);
+}
+
+#copy {
+	cursor: pointer;
+	font-weight: 500;
+	/*text-decoration: none;*/
+}
+
+#copy:hover{
+	color: #f00;
+	border-bottom: #f00 1px solid;
+	/*text-decoration: underline;*/
+}
+
+#copied-hint {
+	position: absolute;
+	color: rgba(0,0,0,0);
+}
+
+.no-param {
+	display: none;
+}
+
+.link-list {
+	text-align: right;
+}
+
+.link-list a {
+	display: inline-block;
+	padding: 2px;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	border-radius: 2px;
+	text-decoration: none;
+	color: #666;
+}
+
+.link-list a:link, .link-list a:visited {
+	color: #666;
+	border-color: rgba(0,0,0,0.125);
+}
+
+.link-list a:hover, .link-list a:active {
+	color: #f00;
+	border-color: #f00;
+}
+
+</style>
+</head>
+<body>
+	<div class="container">
+        <h2 style="text-align: center;">查看报错日志</h2>
+        <br>
+        <div class="card-columns">
+            <div class="card" style="position:relative">
+            	<div class="info" id="info">
+	            	<svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 1024 1024' width='128' height='128'><path d='M514 63.2c-242.6 0-439.3 200.6-439.3 448.1S271.4 959.4 514 959.4s439.3-200.6 439.3-448.1S756.6 63.2 514 63.2z m50.8 704.3H450V659.6h114.8v107.9zM611.7 512c-43.8 29.7-63.3 58.6-58.6 86.7v18.8h-93.8v-25.8c-1.6-48.4 18.8-87.5 60.9-117.2 39-31.2 57.8-59.4 56.3-84.4-3.1-32.8-21.1-50.8-53.9-53.9-43.8 0-71.1 28.9-82 86.7l-105.5-23.4c18.8-106.2 86.7-157.8 203.9-154.7 96.9 4.7 149.2 48.4 157 131.3 3.2 50-24.9 95.3-84.3 135.9z' fill="currentColor"/></svg>
+	            </div>
+                <h4>第一步</h4>
+                <p style="position:relative;"><a id="copy"><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="currentColor" overflow="hidden"><path d="M938 271.5c.5-9.9-3-20-10.6-27.6L756.9 73.4c-7.4-7.4-17.2-10.9-26.9-10.6H374.4c-40.2 0-72.9 32.7-72.9 72.9v43.6H157.3c-40.2 0-72.9 32.7-72.9 72.9v183.1c0 22.1 17.9 40 40 40s40-17.9 40-40v-176h137.1v509.8c0 40.2 32.7 72.9 72.9 72.9H641v36.5H164.4V700.3h-.1c-1-21.2-18.5-38-39.9-38s-38.9 16.8-39.9 38h-.1v185.2c0 40.2 32.7 72.9 72.9 72.9h490.8c40.2 0 72.9-32.7 72.9-72.9V842h144.2c40.2 0 72.9-32.7 72.9-72.9l-.1-497.6zM731.7 150.8l111.1 111.1H731.7V150.8zM858.1 762H381.5V142.8h282v120.1c0 37.1 30.2 67.2 67.2 67.2H858V762z"/><path d="M452.9 478.8c0 21.7 17.8 39.5 39.5 39.5h254.7c21.7 0 39.5-17.8 39.5-39.5s-17.8-39.5-39.5-39.5H492.4c-21.7 0-39.5 17.8-39.5 39.5zm294.2 94.5H492.4c-21.7 0-39.5 17.8-39.5 39.5s17.8 39.5 39.5 39.5h254.7c21.7 0 39.5-17.8 39.5-39.5s-17.8-39.5-39.5-39.5zM84.4 569.3a40 40 0 1 0 80 0 40 40 0 1 0-80 0z"/></svg>
+                复制</span></a>日志文件路径:<span id=copied-hint>&nbsp;&nbsp;已复制！</span></p>
+                <code id="filepath">file:///Users/wzh/Library/Application Support/Steam/steamapps/common/Don't Starve Together/dontstarve_steam.app/Contents/mods/bugtracker-log-10.html</code>
+            </div>
+            <div class="card">
+                <h4>第二步</h4>
+                <p>粘贴到浏览器地址栏，即可查看日志内容</p>
+            </div>
+
+        </div>
+        <div class="card-columns no-param">
+            <div class="card">
+            	<h4>回溯</h4>
+            	<p>这是一个饥荒联机版辅助模组，用于详细标注游戏报错日志，方便玩家快速定位问题。</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="link-list">
+        <p><a href="http://www.baidu.com" target="_blank">模组介绍</a> <a href="https://dont-starve-mod.github.io/zh/author" target="_blank">联系作者</a></p>            
+        </div>
+        <br><br>
+    </div>
+
+    <textarea style="font-size:0px; color:rgba(0,0,0,0); opacity: 0; border: none;" id="clipboard-temp"></textarea>
+	
+</body>
+
+<script type="text/javascript">
+(function(){
 
 function getQueryString(name){
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -44,86 +185,40 @@ function getQueryString(name){
 	if (r != null) {
 		return decodeURIComponent(r[2]);
 	};
-	console.log("failed to get param: " + name);
+	console.log("Failed to get param `" + name + "`");
 	return null;
 }
+var copy = document.getElementById("copy");
+var filepath = document.getElementById("filepath");
+var input = document.getElementById("clipboard-temp");
+var hint = document.getElementById("copied-hint");
 
-function formatTime(value) {
-	let date = new Date(value * 1000);
-	let year = date.getFullYear();
-	let month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
-	let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-	let hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
-	let minute = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-	let second = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
-	return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+var p = getQueryString("p");
+if (p != null){
+	filepath.innerHTML = "file://" + p;
 }
-
-function parseHistory(history){
-	var temp = history.split(";");
-	var result = [];
-	for (var i = 0; i < temp.length; ++i){
-		var parts = temp[i].split(",");
-		if (parts.length == 2 
-			&& !isNaN(parseInt(parts[0])) 
-			&& !isNaN(parseInt(parts[1]))
-			&& !(parseInt(parts[1]) == -1)){
-			result.push([parseInt(parts[0]), formatTime(parseInt(parts[1]))]);
-		}
+else{
+	var cards = document.getElementsByClassName("card-columns");
+	for (var i = 0; i < cards.length; ++i){
+		cards[i].style.display = cards[i].classList.contains("no-param") ? "block" : "none";
 	}
-	console.log(result);
-	return result;
 }
 
-window.onload = function(){
-	console.log("URL length: ", window.location.href.length);
-
-	var root = getQueryString("r"); 	//  /User/DST/mods/
-	var prefix = getQueryString("pre"); //  bugtracker-log-
-	var history = getQueryString("h");  //  5,99999;6,1145;9,13130;10,-1
-
-	var box = document.getElementById("box");
-	var title = box.getElementsByTagName("h1")[0];
-	var list = box.getElementsByTagName("ul")[0];
-
-	if (root && prefix && history){
-		history = parseHistory(history);
-		if (history.length){
-			for (var i = 0; i < history.length; ++i){
-				var item = document.createElement("li");
-				var link = document.createElement("a");
-				list.appendChild(item);
-				item.appendChild(link);
-
-				link.href = "file://" + root + prefix + history[i][0] + ".html";
-				link.innerHTML = history[i][1];
-				console.log(i, link.href);
-				if (i == 0){
-					link.innerHTML = "(最新) " + link.innerHTML;
-				}
-			}
-			title.innerHTML = "查看报错日志";
-			return true;
-		}
-	}
-
-	title.innerHTML = "错误追踪+";
-	document.getElementById("info").style.display = "block";
+copy.onclick = function(){
+	input.value = filepath.innerHTML;
+	input.focus();
+	input.select();
+	document.execCommand("copy");
+	hint.style.color = "rgb(100,200,100)";
 }
-	</script>
-</head>
-<body>
-	<div class="main">
-		<div class="container">
-			<div id="box">
-				<h1></h1>				
-				<ul></ul>
-				<div id="info">
-					<p>“错误追踪+”是饥荒联机版的一个辅助模组。</p>
-					<p>当游戏报错时, 该模组提供详细的错误分析日志, 方便看不懂代码的普通玩家快速排查问题。</p>
-					<p><a href="https://dont-starve-mod.github.io/lw/zh/bugtracker_index/" target="_blank">查看详情</a></p>
-				</div>
-			</div>
-		</div>
-	</div>
-</body>
+})()
+</script>
+<script type="text/javascript" src="https://unpkg.com/@popperjs/core@2"></script>
+<script type="text/javascript" src="https://unpkg.com/tippy.js@6"></script>
+<script type="text/javascript">
+(function(){
+var info = document.getElementById("info");
+tippy(info, {"content": "「回溯」会在本地生成一个详细的报错日志，但饥荒禁止打开本地文件，只允许打开在线网页，并且受限于浏览器的安全规则，在线网页也不能自动打开本地文件，所以需要手动复制路径，查看文件内容。", "maxWidth": 300})
+})()
+</script>
+</html>
